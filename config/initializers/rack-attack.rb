@@ -20,6 +20,12 @@ class Rack::Attack
   #  end
   #end
 
+  throttle 'stories/cookie', limit: 30, period: 30.minutes do |req|
+    if req.path == '/stories' && req.post?
+      req.cookies['token'].presence
+    end
+  end
+
   self.throttled_response = lambda do |env|
     [429, {}, {
       error: "Rate Limit Exceeded"
